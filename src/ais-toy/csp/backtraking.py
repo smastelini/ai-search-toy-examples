@@ -16,8 +16,8 @@ def _backtrack(assignment, csp):
                 result = _backtrack(assignment, csp)
                 if result is not None:
                     return result
-        if var.to_string() in assignment:
-            del assignment[var.to_string()]
+        if var.name in assignment:
+            del assignment[var.name]
         if inferences is not None:
             for inference in inferences:
                 assignment.pop(inference, None)
