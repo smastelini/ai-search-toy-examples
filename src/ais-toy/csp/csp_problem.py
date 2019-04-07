@@ -29,6 +29,9 @@ class CSPProblem(ABC):
 
         # TODO to deal with the constraints
 
+    def _build_constraint_graph(self):
+        pass
+
     @abstractmethod
     def is_complete(self, assignment):
         return len(self._unassigned_variables) == 0
@@ -74,4 +77,7 @@ class CSPProblem(ABC):
         pass
 
     def argmin_conflicts(self, var, candidate):
+        pass
+
+    def unassigned_neighbours(self, x_i, x_j):
         pass

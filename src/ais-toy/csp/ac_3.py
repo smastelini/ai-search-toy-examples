@@ -1,5 +1,6 @@
-def AC_3(csp):
-    queue = csp.get_all_arcs()
+def AC_3(csp, queue=None):
+    if queue is None:
+        queue = csp.get_all_arcs()
 
     while len(queue) > 0:
         x_i, x_j = queue.pop(0)

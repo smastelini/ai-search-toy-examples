@@ -1,4 +1,4 @@
-class DirGraph:
+class Graph:
     def __init__(self, nodes=[]):
         self._nodes = nodes
 
