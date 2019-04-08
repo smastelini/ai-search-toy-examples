@@ -1,3 +1,4 @@
+import numpy as np
 from abc import ABC, abstractmethod
 from ais_toy.struct import Variable, Node, Graph
 
@@ -53,8 +54,18 @@ class CSPProblem(ABC):
         Also depends on a heuristic"""
         pass
 
-    def is_consistent(self, value, assignment):
-        pass
+    def is_consistent(self, var, value, assignment):
+        ngbs = [p.state for p in self._constraint_graph.neighbors(var.name)]
+        check = []
+        for n in ngbs:
+            if n in assignment:
+                check.append(
+                    self._constraints[(var.name, n)](value, assignment[n])
+                    if (var.name, n) in self._constraints else
+                    self._constraints[(n, var.name)](assignment[n], value)
+                )
+
+        return np.all(check)
 
     @abstractmethod
     def inference(self, var, value):
@@ -74,7 +85,14 @@ class CSPProblem(ABC):
         return selected
 
     def get_complete_assignement(self):
-        pass
+        r_assign = {}
+        for val, var in self._unassigned_variables.items():
+            dmn = var.domain()
+            d_idx = np.random.randint(
+                low=0, high=len(dmn)
+            )
+            r_assign[val] = dmn[d_idx]
+        return r_assign
 
     def is_solution(self, candidate):
         pass

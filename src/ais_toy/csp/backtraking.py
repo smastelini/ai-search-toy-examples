@@ -8,8 +8,8 @@ def _backtrack(assignment, csp):
 
     var = csp.select_unassigned_var()
     for value in csp.order_domain_values(var, assignment):
-        if csp.is_consistent(value, assignment):
-            assignment[var.to_string()] = value
+        if csp.is_consistent(var, value, assignment):
+            assignment[var.state] = value
             inferences = csp.inference(var, value)
             if inferences is not None:
                 assignment.update(inferences)
