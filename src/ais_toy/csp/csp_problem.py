@@ -93,12 +93,14 @@ class CSPProblem(ABC):
             if (x_i, x_j) in self._constraints else \
             self._constraints[(x_j, x_i)](y, x)
 
-    def neighbours_except(self, x_i, x_j):
-        neighbours = self._constraint_graph.neighbors(x_i)
-        selected = [p.state for p in neighbours if p.state != x_j]
+    def neighbors_except(self, x_i, x_j):
+        neighbors = self._constraint_graph.neighbors(x_i)
+        selected = [p.state for p in neighbors if p.state != x_j]
         return selected
 
     def get_complete_assignement(self):
+        """ Used by the local search methods, which deal with complete
+        assignments"""
         r_assign = {}
         for val, var in self._unassigned_variables.items():
             dmn = var.domain()
@@ -106,6 +108,7 @@ class CSPProblem(ABC):
                 low=0, high=len(dmn)
             )
             r_assign[val] = dmn[d_idx]
+            self.assign_variable(val, dmn[d_idx])
         return r_assign
 
     def is_solution(self, candidate):
@@ -121,8 +124,8 @@ class CSPProblem(ABC):
     def argmin_conflicts(self, var, candidate):
         pass
 
-    def unassigned_neighbours(self, x_i):
-        neighbours = self._constraint_graph.neighbors(x_i)
-        selected = [p.state for p in neighbours if p.state in
+    def unassigned_neighbors(self, x_i):
+        neighbors = self._constraint_graph.neighbors(x_i)
+        selected = [p.state for p in neighbors if p.state in
                     self._unassigned_variables]
         return selected

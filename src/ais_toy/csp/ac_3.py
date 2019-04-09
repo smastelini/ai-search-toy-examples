@@ -7,7 +7,7 @@ def AC_3(csp, queue=None):
         if _revise(csp, x_i, x_j):
             if len(x_i.domain()) == 0:
                 return False
-            for x_k in csp.neighbours_except(x_i, x_j):
+            for x_k in csp.neighbors_except(x_i, x_j):
                 queue.append((x_k, x_i))
     return True
 
