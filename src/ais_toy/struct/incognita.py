@@ -1,7 +1,7 @@
-class Variable:
+class Incognita:
     def __init__(self, name, domain):
-        self.value = None
         self.name = name
+        self.value = None
         if not isinstance(domain, set):
             self._domain = set(domain)
         else:
