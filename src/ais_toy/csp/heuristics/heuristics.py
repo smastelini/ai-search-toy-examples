@@ -58,4 +58,4 @@ def least_constraining_value(csp, var_id):
                     csp._constraints[(var_id, n)] else \
                     csp._constraints[(n, var_id)](v, val)
                 fail_check[val] += 1 if not aux else 0
-    return min(fail_check, key=fail_check.get)
+    return list(sorted(fail_check, key=fail_check.get).keys())

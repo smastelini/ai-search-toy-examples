@@ -7,10 +7,10 @@ def _backtrack(assignment, csp):
         return assignment
 
     var = csp.select_unassigned_var()
-    for value in csp.order_domain_values(var, assignment):
+    for value in csp.order_domain_values(var):
         if csp.is_consistent(var, value, assignment):
             assignment[var.name] = value
-            csp.assign_variable(var.name, value)
+            csp.assign_variable(var, value)
             inferences = csp.inference(var, value)
             if inferences is not None:
                 assignment.update(inferences)
@@ -18,7 +18,7 @@ def _backtrack(assignment, csp):
                 if result is not None:
                     return result
         if var.name in assignment:
-            csp.unassign_variable(var.name)
+            csp.unassign_variable(var)
             del assignment[var.name]
         if inferences is not None:
             for inference in inferences:

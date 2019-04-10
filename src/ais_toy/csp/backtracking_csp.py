@@ -1,4 +1,8 @@
-from csp_problem import CSPProblem
+from ais_toy.csp import CSPProblem
+from ais_toy.csp.heuristics import minimum_remaining_values, \
+    degree_heuristic, least_constraining_value
+from ais_toy.csp import AC_3
+from ais_toy.csp import backtracking_search
 
 
 class BacktrackingCSP(CSPProblem):
@@ -6,19 +10,25 @@ class BacktrackingCSP(CSPProblem):
         super().__init__(self, X, D, C)
 
     def select_unassigned_var(self):
-        """ Select one among the variables which were not yet assigned and
-        returns it.
+        min_, counts = minimum_remaining_values(self)
+        if list(counts.values()).count(counts[min_]) > 1:
+            max_, _ = degree_heuristic(self)
+            return max_
+        else:
+            return min_
 
-        Depends on a chosen heuristic. """
-        pass
-
-    def order_domain_values(self, var, assignment):
+    def order_domain_values(self, var):
         """ Determines the order in which the possible domain's values are
         going to be evaluated.
 
-        Also depends on a heuristic"""
-        pass
+        Use the least constraining value for this end.
+        """
+        return least_constraining_value(self, var)
 
     def inference(self, var, value):
-        """ Used to impose some kind of consistency check."""
-        pass
+        """ Uses AC-3 to impose arc consistency. """
+        checked = AC_3(self)
+        return {} if checked else None
+
+    def solve(self):
+        backtracking_search(self)

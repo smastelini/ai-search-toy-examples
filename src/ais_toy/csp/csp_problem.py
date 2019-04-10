@@ -56,16 +56,25 @@ class CSPProblem(ABC):
         """ Used to impose some kind of consistency check."""
         pass
 
+    @abstractmethod
+    def solve(self):
+        """ Method that effectively solves the CSP problem. """
+        pass
+
     def is_complete(self, assignment):
         return len(self._unassigned_variables) == 0
 
     def assign_variable(self, var, value):
+        if isinstance(var, Incognita):
+            var = var.name
         self._assigned_variables[var] = self._unassigned_variables.pop(
             var
         )
         self._assigned_variables[var].value = value
 
     def unassign_variable(self, var):
+        if isinstance(var, Incognita):
+            var = var.name
         aux = self._assigned_variables[var].value
         self._assigned_variables[var].value = None
         self._unassigned_variables[var] = self._assigned_variables.pop(var)
