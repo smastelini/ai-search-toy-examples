@@ -8,7 +8,7 @@ class Incognita:
             self._domain = domain
 
     def domain(self):
-        return self._domain.tolist()
+        return list(self._domain)
 
     def rem_from_domain(self, x):
         if x in self._domain:

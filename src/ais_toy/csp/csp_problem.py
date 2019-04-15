@@ -20,15 +20,12 @@ class CSPProblem(ABC):
     def _build_constraint_graph(self):
         nodes = {}
 
-        for p, q in self._constraints.keys():
-            if p not in nodes:
-                nodes[p] = Node(p)
-
-            if q not in nodes:
-                nodes[q] = Node(q)
+        for p in self._unassigned_variables.keys():
+            nodes[p] = Node(p)
 
         for p, q in self._constraints.keys():
             nodes[p].add_edge(nodes[q])
+            nodes[q].add_edge(nodes[p])
 
         g = Graph()
         g.add_multiple_nodes([n for n in nodes.values()])
@@ -81,7 +78,7 @@ class CSPProblem(ABC):
         return aux
 
     def is_consistent(self, var, value, assignment):
-        ngbs = [p.state for p in self._constraint_graph.neighbors(var.name)]
+        ngbs = [p[0].state for p in self._constraint_graph.neighbors(var.name)]
         check = []
         for n in ngbs:
             if n in assignment:
@@ -138,3 +135,15 @@ class CSPProblem(ABC):
         selected = [p.state for p in neighbors if p.state in
                     self._unassigned_variables]
         return selected
+
+    def domain(self, var_id):
+        if var_id in self._unassigned_variables:
+            return self._unassigned_variables[var_id].domain()
+        else:
+            return self._assigned_variables[var_id].domain()
+
+    def rem_from_domain(self, var_id, val):
+        if var_id in self._unassigned_variables:
+            return self._unassigned_variables[var_id].rem_from_domain(val)
+        else:
+            return self._assigned_variables[var_id].rem_from_domain(val)

@@ -112,4 +112,4 @@ def random_map_coloring(n_points, k, max_fails=10):
     for p, q in connected:
         C[(coordinates[p], coordinates[q])] = lambda col1, col2: col1 != col2
 
-    return X, D, C
+    return {'X': X, 'D': D, 'C': C}

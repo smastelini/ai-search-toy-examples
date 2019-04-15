@@ -5,7 +5,7 @@ def AC_3(csp, queue=None):
     while len(queue) > 0:
         x_i, x_j = queue.pop(0)
         if _revise(csp, x_i, x_j):
-            if len(x_i.domain()) == 0:
+            if len(csp.domain(x_i)) == 0:
                 return False
             for x_k in csp.neighbors_except(x_i, x_j):
                 queue.append((x_k, x_i))
@@ -14,13 +14,13 @@ def AC_3(csp, queue=None):
 
 def _revise(csp, x_i, x_j):
     revised = False
-    for x in x_i.domain():
+    for x in csp.domain(x_i):
         satisfies = False
-        for y in x_j.domain():
+        for y in csp.domain(x_j):
             satisfies = csp.constraint_checks(x_i, x_j, x, y)
             if satisfies:
                 break
         if not satisfies:
-            x_i.rem_from_domain(x)
+            csp.rem_from_domain(x_i, x)
             revised = True
     return revised

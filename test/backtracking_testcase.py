@@ -1,0 +1,27 @@
+import sys
+import matplotlib.pyplot as plt
+sys.path.append('../src/')
+from ais_toy.csp import BacktrackingCSP
+from ais_toy.problem_generator import random_map_coloring
+
+
+problem = random_map_coloring(110, 3)
+csp = BacktrackingCSP(**problem)
+retr = csp.solve()
+
+
+colors = {
+ 0: 'red',
+ 1: 'blue',
+ 2: 'green',
+ 3: 'yellow'
+}
+
+plt.figure(figsize=(10, 5))
+for p, q in problem['C']:
+    plt.plot([p[0], q[0]], [p[1], q[1]], 'k-')
+
+for p, c in retr.items():
+    plt.scatter(p[0], p[1], c=colors[c])
+# plt.legend(fontsize=8)
+plt.show()

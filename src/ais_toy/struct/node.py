@@ -1,5 +1,5 @@
 class Node:
-    def __init__(self, state, directed=False):
+    def __init__(self, state):
         self.state = state
         self._edges = []
 

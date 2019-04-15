@@ -45,7 +45,7 @@ def degree_heuristic(csp):
 
 def least_constraining_value(csp, var_id):
     var = csp._unassigned_variables[var_id]
-    neighbors_ids = [p.state for p in
+    neighbors_ids = [p for p in
                      csp._constraint_graph.neighbors(var.name)]
     fail_check = {}
     for val in var.domain():
@@ -58,4 +58,4 @@ def least_constraining_value(csp, var_id):
                     csp._constraints[(var_id, n)] else \
                     csp._constraints[(n, var_id)](v, val)
                 fail_check[val] += 1 if not aux else 0
-    return list(sorted(fail_check, key=fail_check.get).keys())
+    return sorted(fail_check, key=fail_check.get)
