@@ -5,7 +5,7 @@ from ais_toy.csp import BacktrackingCSP
 from ais_toy.problem_generator import random_map_coloring
 
 
-problem = random_map_coloring(110, 3)
+problem = random_map_coloring(20, 3)
 csp = BacktrackingCSP(**problem)
 retr = csp.solve()
 
