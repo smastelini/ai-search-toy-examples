@@ -54,7 +54,7 @@ class CSPProblem(ABC):
         pass
 
     @abstractmethod
-    def solve(self):
+    def solve(self, *args, **kwargs):
         """ Method that effectively solves the CSP problem. """
         pass
 
@@ -64,9 +64,10 @@ class CSPProblem(ABC):
     def assign_variable(self, var, value):
         if isinstance(var, Incognita):
             var = var.name
-        self._assigned_variables[var] = self._unassigned_variables.pop(
-            var
-        )
+        if var in self._unassigned_variables:
+            self._assigned_variables[var] = self._unassigned_variables.pop(
+                var
+            )
         self._assigned_variables[var].value = value
 
     def unassign_variable(self, var):
@@ -104,31 +105,17 @@ class CSPProblem(ABC):
         selected = [p.state for p in neighbors if p.state != x_j]
         return selected
 
-    def get_complete_assignement(self):
-        """ Used by the local search methods, which deal with complete
-        assignments"""
-        r_assign = {}
-        for val, var in self._unassigned_variables.items():
-            dmn = var.domain()
-            d_idx = np.random.randint(
-                low=0, high=len(dmn)
-            )
-            r_assign[val] = dmn[d_idx]
-            self.assign_variable(val, dmn[d_idx])
-        return r_assign
-
     def is_solution(self, candidate):
         for inc in candidate:
-            ngbr = [n.state for n in self._constraint_graph.neighbors(inc)]
+            ngbr = [
+                n[0].state for n in self._constraint_graph.neighbors(inc)
+            ]
             for n in ngbr:
                 if not self.constraint_checks(inc, n, candidate[inc],
                                               candidate[n]):
                     return False
 
         return True
-
-    def argmin_conflicts(self, var, candidate):
-        pass
 
     def unassigned_neighbors(self, x_i):
         neighbors = self._constraint_graph.neighbors(x_i)

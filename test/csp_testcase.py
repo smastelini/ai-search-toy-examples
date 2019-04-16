@@ -2,15 +2,19 @@ import sys
 import matplotlib.pyplot as plt
 sys.path.append('../src/')
 # from ais_toy.csp import BacktrackingCSP
-from ais_toy.csp import BacktrackingCSPMAC
+# from ais_toy.csp import BacktrackingCSPMAC
+from ais_toy.csp import MinConflictsCSP
 from ais_toy.problem_generator import random_map_coloring
 
 
 problem = random_map_coloring(20, 3)
 # csp = BacktrackingCSP(**problem)
-csp = BacktrackingCSPMAC(**problem)
-retr = csp.solve()
+csp = MinConflictsCSP(**problem)
+retr = csp.solve(max_steps=10000)
 
+if retr is None:
+    print('No solution was achieved')
+    exit()
 
 colors = {
  0: 'red',
