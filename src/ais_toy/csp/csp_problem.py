@@ -132,7 +132,7 @@ class CSPProblem(ABC):
 
     def unassigned_neighbors(self, x_i):
         neighbors = self._constraint_graph.neighbors(x_i)
-        selected = [p.state for p in neighbors if p.state in
+        selected = [p for p in neighbors if p in
                     self._unassigned_variables]
         return selected
 
