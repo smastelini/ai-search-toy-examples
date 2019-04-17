@@ -58,23 +58,26 @@ def _lines_cross(p1, q1, p2,  q2):
     return False
 
 
-# def _lines_cross2(p1, q1, p2,  q2):
-#     m1 = (p1[1] - q1[1] + 1e-6)/(p1[0] - q1[0] + 1e-6)
-#     m2 = (p2[1] - q2[1] + 1e-6)/(p2[0] - q2[0] + 1e-6)
-#
-#     if np.isclose(m1, m2):
-#         return False
-#
-#     b1 = p1[1] - m1 * p1[0]
-#     b2 = p2[1] - m2 * p2[0]
-#
-#     x = (b2 - b1 + 1e-6)/(m1 - m2 + 1e-6)
-#
-#     if x >= min(p1[0], p2[0], q1[0], q2[0]) and \
-#             x <= max(p1[0], p2[0], q1[0], q2[0]):
-#         return True
-#
-#     return False
+def _lines_cross2(p1, q1, p2,  q2):
+    m1 = (q1[1] - p1[1])/(q1[0] - p1[0])
+    m2 = (q2[1] - p2[1])/(q2[0] - p2[0])
+
+    if np.isclose(m1, m2):
+        return False
+
+    b1 = p1[1] - m1 * p1[0]
+    b2 = p2[1] - m2 * p2[0]
+
+    x = (b2 - b1)/(m1 - m2)
+    y = m1 * (x - p1[0]) + p1[1]
+
+    if x > min(p1[0], q1[0]) and x > min(p2[0], q2[0]) and \
+            x < max(p1[0], q1[0]) and x < max(p2[0], q2[0]) and \
+            y > min(p1[1], q1[1]) and y > min(p2[1], q2[1]) and \
+            y < max(p1[1], q1[1]) and y < max(p2[1], q2[1]):
+        return True
+
+    return False
 
 
 def _argmin_connection(i, coordinates, connected):
@@ -87,61 +90,60 @@ def _argmin_connection(i, coordinates, connected):
         if (i, j) in connected or (j, i) in connected:
             dists[j] = float('Inf')
 
-    j = np.argmin(dists)
+    while True:
+        j = np.argmin(dists)
 
-    if len(connected) == 0:
-        return (i, j)
+        if not np.isfinite(dists[j]):
+            return None
 
-    intersect = []
-    for p, q in connected:
-        if coordinates[i][0] < coordinates[j][0]:
-            p1 = coordinates[i]
-            q1 = coordinates[j]
+        if len(connected) == 0:
+            return (i, j)
+
+        intersect = []
+        for p, q in connected:
+            if coordinates[i][0] < coordinates[j][0]:
+                p1 = coordinates[i]
+                q1 = coordinates[j]
+            else:
+                p1 = coordinates[j]
+                q1 = coordinates[i]
+
+            if coordinates[p][0] < coordinates[q][0]:
+                p2 = coordinates[p]
+                q2 = coordinates[q]
+            else:
+                p2 = coordinates[q]
+                q2 = coordinates[p]
+
+            intersect.append(_lines_cross2(p1, q1, p2, q2))
+
+        if not any(intersect):
+            return (i, j)
         else:
-            p1 = coordinates[j]
-            q1 = coordinates[i]
-
-        if coordinates[p][0] < coordinates[q][0]:
-            p2 = coordinates[p]
-            q2 = coordinates[q]
-        else:
-            p2 = coordinates[q]
-            q2 = coordinates[p]
-
-        intersect.append(_lines_cross(p1, q1, p2, q2))
-    # intersect = [
-    #     _lines_cross(
-    #         coordinates[i], coordinates[j],
-    #         coordinates[p], coordinates[q]
-    #     ) for (p, q) in connected
-    # ]
-
-    if not any(intersect):
-        return (i, j)
-
-    return None
+            dists[j] = float('Inf')
 
 
-def random_map_coloring(n_points, k, max_fails=100):
+def random_map_coloring(n_points, k):
     x = np.random.uniform(size=n_points)
     y = np.random.uniform(size=n_points)
 
     coordinates = [(i, j) for i, j in zip(x, y)]
     connected = set()
 
-    # TODO verify stopping criteria and build graph
-    fails = 0
+    failed = set()
     while True:
         p = np.random.randint(low=0, high=n_points)
+        if p in failed:
+            continue
+
         connection = _argmin_connection(p, coordinates, connected)
 
         if connection is None:
-            fails += 1
+            failed.add(p)
         else:
-            fails = 0
             connected.add(connection)
 
-        if fails >= max_fails:
+        if len(failed) == n_points:
             break
 
     X = coordinates
