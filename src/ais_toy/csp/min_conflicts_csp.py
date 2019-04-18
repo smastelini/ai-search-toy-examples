@@ -43,7 +43,7 @@ class MinConflictsCSP(CSPProblem):
     def inference(self, var, value):
         raise NotImplementedError
 
-    def solve(self, max_steps=100):
+    def solve(self, max_steps):
         """ Method that effectively solves the CSP problem. """
         return min_conflicts(self, max_steps)
 

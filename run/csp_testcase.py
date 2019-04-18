@@ -12,7 +12,7 @@ from ais_toy.csp import MinConflictsCSP
 from ais_toy.problem_generator import random_map_coloring
 
 
-def plot_solution_and_save(problem, solution, n_points, k, path):
+def plot_solution_and_save(problem, solution, method_n, n_points, k, path):
     colors = {
      0: 'red',
      1: 'blue',
@@ -24,20 +24,23 @@ def plot_solution_and_save(problem, solution, n_points, k, path):
     for p, q in problem['C']:
         plt.plot([p[0], q[0]], [p[1], q[1]], 'k-', linewidth=0.5, zorder=1)
 
-    for p, c in retr.items():
+    for p, c in solution.items():
         plt.scatter(p[0], p[1], c=colors[c], zorder=2)
 
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.title('Map coloring: {0} x {1}'.format(n_points, k))
-    # plt.show()
-    plt.savefig('{0}/map_coloring_{1}_{2}.eps'.format(path, n_points, k))
+    plt.title('Map coloring ({0}): {1} x {2}'.format(method_n, n_points, k))
+    plt.savefig('{0}/map_coloring_{1}_{2}_{3}.eps'.format(
+        path, n_points, k, method_n.lower().replace(' ', '_')
+    ))
 
 
 def solve_and_compute(method_n, method, problem, max_steps):
+    np.random.seed(None)
+    seed = np.random.get_state()
     csp = method(**problem)
 
-    if method_n == 'min_conflicts':
+    if method_n == 'Min Conflicts':
         start = time.time()
         solution = csp.solve(max_steps=max_steps)
         end = time.time()
@@ -48,10 +51,10 @@ def solve_and_compute(method_n, method, problem, max_steps):
 
     t_time = end - start
 
-    return t_time, solution
+    return t_time, solution, seed
 
 
-def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=10000,
+def check_and_solve(k_sizes, problem_sizes, n_repeats=30, max_steps=10000,
                     output_path='./results'):
 
     rep_seeds = np.random.randint(low=0, high=9999, size=n_repeats).tolist()
@@ -63,24 +66,24 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=10000,
         os.makedirs(plot_logs)
 
     solvers = {
-        'backtracking': BacktrackingCSP,
-        'backtracking_mac': BacktrackingCSPMAC,
-        'min_conflicts': MinConflictsCSP
+        'Backtracking AC-3': BacktrackingCSP,
+        'Backtracking MAC': BacktrackingCSPMAC,
+        'Min Conflicts': MinConflictsCSP
     }
 
     for k in k_sizes:
         for size in problem_sizes:
             for solver_n, solver in solvers.items():
                 log_name = '{0}/mc_{1}_{2}_{3}.tdat'.format(
-                    time_logs, size, k, solver_n
+                    time_logs, size, k, solver_n.lower().replace(' ', '_')
                 )
 
                 log_exists = os.path.isfile(log_name)
-                f = open(log_name, 'r+b')
                 if not log_exists:
                     tlog = {}
                 else:
-                    tlog = pickle.load(f)
+                    with open(log_name, 'rb') as f:
+                        tlog = pickle.load(f)
 
                 plot_saved = False
                 for r in range(n_repeats):
@@ -89,22 +92,24 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=10000,
                     np.random.seed(rep_seeds[r])
                     problem = random_map_coloring(size, k)
 
-                    t_time, solution = solve_and_compute(
+                    t_time, solution, seed = solve_and_compute(
                         solver_n, solver, problem, max_steps
                     )
 
                     if solution is not None and not plot_saved:
                         plot_solution_and_save(
-                            problem, solution, size, k, plot_logs
+                            problem, solution, solver_n, size, k, plot_logs
                         )
                         plot_saved = True
 
                     d = {}
                     d['duration'] = t_time
                     d['solved'] = 1 if solution is not None else -1
+                    d['seed'] = seed
 
                     tlog[r] = d
-                    pickle.dump(obj=tlog, file=f, protocol=-1)
+                    with open(log_name, 'wb') as f:
+                        pickle.dump(obj=tlog, file=f, protocol=-1)
 
                 f.close()
 
