@@ -12,4 +12,4 @@ class Graph:
         return len(self._nodes)
 
     def neighbors(self, id):
-        return self._nodes[id]._edges
+        return [n.state for n, _ in self._nodes[id]._edges]

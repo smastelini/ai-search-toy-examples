@@ -22,18 +22,28 @@ class MinConflictsCSP(CSPProblem):
             self.assign_variable(val, dmn[d_idx])
         return r_assign
 
+    def is_solution(self, candidate):
+        for incg in candidate:
+            ngbr = self._constraint_graph.neighbors(incg)
+
+            for n in ngbr:
+                if not self.constraint_checks(incg, n, candidate[incg],
+                                              candidate[n]):
+                    return False
+
+        return True
+
     def domain(self, var_id):
         return self._assigned_variables[var_id].domain()
 
     def rem_from_domain(self, var_id, val):
-        return self._assigned_variables[var_id].rem_from_domain(val)
+        self._assigned_variables[var_id].rem_from_domain(val)
 
     def select_unassigned_var(self):
         confliting_vars = []
         for val, var in self._assigned_variables.items():
-            ngbrs = [
-                n[0].state for n in self._constraint_graph.neighbors(val)
-            ]
+            ngbrs = self._constraint_graph.neighbors(val)
+
             for n in ngbrs:
                 if not self.constraint_checks(
                     val, n, var.value, self._assigned_variables[n].value
@@ -55,9 +65,7 @@ class MinConflictsCSP(CSPProblem):
 
     def argmin_conflicts(self, var):
         conflicts = {}
-        ngbrs = [
-            n[0].state for n in self._constraint_graph.neighbors(var.name)
-        ]
+        ngbrs = self._constraint_graph.neighbors(var.name)
         for v in var.domain():
             count = 0
             for n in ngbrs:

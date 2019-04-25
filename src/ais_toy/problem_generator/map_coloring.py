@@ -147,7 +147,7 @@ def random_map_coloring(n_points, k):
             break
 
     X = coordinates
-    D = [set([d for d in range(k)]) for v in range(n_points)]
+    D = [{d for d in range(k)} for v in range(n_points)]
     C = {}
 
     for p, q in connected:

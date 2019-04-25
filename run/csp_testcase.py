@@ -68,8 +68,8 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=100000,
         os.makedirs(plot_logs)
 
     solvers = {
-        'Backtracking': BacktrackingCSP,
-        # 'Backtracking Forward Checking': BacktrackingCSPFowardChecking,
+        # 'Backtracking': BacktrackingCSP,
+        'Backtracking Forward Checking': BacktrackingCSPFowardChecking,
         # 'Backtracking MAC': BacktrackingCSPMAC,
         # 'Min Conflicts': MinConflictsCSP
     }
@@ -130,7 +130,7 @@ np.random.seed(7)
 # k_sizes = [3, 4]
 # problem_sizes = [5, 10, 15, 20, 30, 40, 50]
 k_sizes = [4]
-problem_sizes = [20]
+problem_sizes = [50]
 
 if __name__ == '__main__':
     check_and_solve(k_sizes=k_sizes, problem_sizes=problem_sizes,

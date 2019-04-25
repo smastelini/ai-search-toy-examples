@@ -18,9 +18,11 @@ class Incognita:
         self._domain.add(x)
 
     def assign(self, value):
-        self.rem_from_domain(value)
+        self._aux_domain = self._domain - {value}
+        self._domain = {value}
         self.value = value
 
     def unassign(self):
-        self.expand_domain(self.value)
+        self._domain = self._aux_domain.union({self.value})
         self.value = None
+        del self._aux_domain
