@@ -37,9 +37,10 @@ def plot_solution_and_save(problem, solution, method_n, n_points, k, path):
 
 def solve_and_compute(method_n, method, problem, max_steps):
     np.random.seed(None)
-    seed = np.random.get_state()
+    seed = np.random.randint(low=0, high=9999)
+    np.random.seed(seed)
     csp = method(**problem)
-
+    print('Solving')
     if method_n == 'Min Conflicts':
         start = time.time()
         solution = csp.solve(max_steps=max_steps)
@@ -50,11 +51,11 @@ def solve_and_compute(method_n, method, problem, max_steps):
         end = time.time()
 
     t_time = end - start
-
+    print('Done')
     return t_time, solution, seed
 
 
-def check_and_solve(k_sizes, problem_sizes, n_repeats=30, max_steps=10000,
+def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=100000,
                     output_path='./results'):
 
     rep_seeds = np.random.randint(low=0, high=9999, size=n_repeats).tolist()
@@ -70,6 +71,15 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=30, max_steps=10000,
         'Backtracking MAC': BacktrackingCSPMAC,
         'Min Conflicts': MinConflictsCSP
     }
+
+    print('Generating problems')
+    problems = {}
+    for k in k_sizes:
+        for size in problem_sizes:
+            for r in range(n_repeats):
+                np.random.seed(rep_seeds[r])
+                problems[(size, k, r)] = random_map_coloring(size, k)
+    print('Problems generated')
 
     for k in k_sizes:
         for size in problem_sizes:
@@ -87,10 +97,10 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=30, max_steps=10000,
 
                 plot_saved = False
                 for r in range(n_repeats):
+                    print('{0}_{1}_{2}_r{3:02d}'.format(size, k, solver_n, r))
                     if r in tlog:
                         continue
-                    np.random.seed(rep_seeds[r])
-                    problem = random_map_coloring(size, k)
+                    problem = problems[(size, k, r)]
 
                     t_time, solution, seed = solve_and_compute(
                         solver_n, solver, problem, max_steps
@@ -114,9 +124,9 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=30, max_steps=10000,
                 f.close()
 
 
-np.random.seed(2019)
+np.random.seed(7)
 k_sizes = [3, 4]
-problem_sizes = [10, 20, 30, 40, 50, 70, 100, 150, 200, 500, 1000]
+problem_sizes = [5, 10, 15, 20, 30, 40, 50]
 
 
 if __name__ == '__main__':
