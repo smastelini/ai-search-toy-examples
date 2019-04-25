@@ -1,7 +1,6 @@
 from ais_toy.csp import CSPProblem
 from ais_toy.csp.heuristics import minimum_remaining_values, \
     degree_heuristic, least_constraining_value
-from ais_toy.csp import AC_3
 from ais_toy.csp import backtracking_search
 
 
@@ -26,9 +25,7 @@ class BacktrackingCSP(CSPProblem):
         return least_constraining_value(self, var.name)
 
     def inference(self, var, value):
-        """ Uses AC-3 to impose arc consistency. """
-        checked = AC_3(self)
-        return {} if checked else None
+        return {}, {}
 
     def solve(self):
         return backtracking_search(self)

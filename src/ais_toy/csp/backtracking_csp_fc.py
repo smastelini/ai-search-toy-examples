@@ -1,14 +1,15 @@
 from ais_toy.csp import BacktrackingCSP
-from ais_toy.csp import MAC
+from ais_toy.csp import backtracking_search
+from ais_toy.csp import forward_checking
 
 
-class BacktrackingCSPMAC(BacktrackingCSP):
+class BacktrackingCSPFowardChecking(BacktrackingCSP):
     def __init__(self, X, D, C):
         super().__init__(X, D, C)
 
     def inference(self, var, value):
-        """ Uses MAC to impose arc consistency. """
-        checked, removed = MAC(self, var.name)
+        """ Uses Forward Checking to impose local arc consistency. """
+        checked, removed = forward_checking(var, value, self)
         inferences = {}
         if checked:
             to_assign = []
@@ -21,4 +22,8 @@ class BacktrackingCSPMAC(BacktrackingCSP):
                     var, value
                 )
                 inferences[var] = value
+
         return (inferences, removed) if checked else (None, removed)
+
+    def solve(self):
+        return backtracking_search(self)

@@ -16,7 +16,6 @@ def minimum_remaining_values(csp):
 
     for id, var in csp._unassigned_variables.items():
         counts[id] = len(var.domain())
-
     return min(counts, key=counts.get), counts
 
 
@@ -38,7 +37,7 @@ def degree_heuristic(csp):
     counts = {}
 
     for id in csp._unassigned_variables:
-        counts[id] = len(csp._constraint_graph.neighbors(id))
+        counts[id] = len(csp.unassigned_neighbors(id))
 
     return max(counts, key=counts.get), counts
 
@@ -46,16 +45,13 @@ def degree_heuristic(csp):
 def least_constraining_value(csp, var_id):
     var = csp._unassigned_variables[var_id]
     neighbors_ids = [p for p in
-                     csp._constraint_graph.neighbors(var.name)]
+                     csp.unassigned_neighbors(var.name)]
     fail_check = {}
     for val in var.domain():
         fail_check[val] = 0
         for n in neighbors_ids:
-            if n not in csp._unassigned_variables:
-                continue
             for v in csp._unassigned_variables[n].domain():
-                aux = csp._constraints[(var_id, n)](val, v) if (var_id, n) in \
-                    csp._constraints[(var_id, n)] else \
-                    csp._constraints[(n, var_id)](v, val)
-                fail_check[val] += 1 if not aux else 0
+                fail_check[val] += int(
+                    not csp.constraint_checks(var_id, n, val, v)
+                )
     return sorted(fail_check, key=fail_check.get)

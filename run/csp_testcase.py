@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append('../src/')
 from ais_toy.csp import BacktrackingCSP
+from ais_toy.csp import BacktrackingCSPFowardChecking
 from ais_toy.csp import BacktrackingCSPMAC
 from ais_toy.csp import MinConflictsCSP
 from ais_toy.problem_generator import random_map_coloring
@@ -67,9 +68,10 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=100000,
         os.makedirs(plot_logs)
 
     solvers = {
-        'Backtracking AC-3': BacktrackingCSP,
-        'Backtracking MAC': BacktrackingCSPMAC,
-        'Min Conflicts': MinConflictsCSP
+        'Backtracking': BacktrackingCSP,
+        # 'Backtracking Forward Checking': BacktrackingCSPFowardChecking,
+        # 'Backtracking MAC': BacktrackingCSPMAC,
+        # 'Min Conflicts': MinConflictsCSP
     }
 
     print('Generating problems')
@@ -118,16 +120,18 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=100000,
                     d['seed'] = seed
 
                     tlog[r] = d
-                    with open(log_name, 'wb') as f:
-                        pickle.dump(obj=tlog, file=f, protocol=-1)
+                    # with open(log_name, 'wb') as f:
+                    #     pickle.dump(obj=tlog, file=f, protocol=-1)
 
-                f.close()
+                # f.close()
 
 
 np.random.seed(7)
-k_sizes = [3, 4]
-problem_sizes = [5, 10, 15, 20, 30, 40, 50]
-
+# k_sizes = [3, 4]
+# problem_sizes = [5, 10, 15, 20, 30, 40, 50]
+k_sizes = [4]
+problem_sizes = [20]
 
 if __name__ == '__main__':
-    check_and_solve(k_sizes, problem_sizes)
+    check_and_solve(k_sizes=k_sizes, problem_sizes=problem_sizes,
+                    n_repeats=1, max_steps=100000, output_path='./results')

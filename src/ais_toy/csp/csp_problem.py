@@ -68,15 +68,13 @@ class CSPProblem(ABC):
             self._assigned_variables[var] = self._unassigned_variables.pop(
                 var
             )
-        self._assigned_variables[var].value = value
+        self._assigned_variables[var].assign(value)
 
     def unassign_variable(self, var):
         if isinstance(var, Incognita):
             var = var.name
-        aux = self._assigned_variables[var].value
-        self._assigned_variables[var].value = None
+        self._assigned_variables[var].unassign()
         self._unassigned_variables[var] = self._assigned_variables.pop(var)
-        return aux
 
     def is_consistent(self, var, value, assignment):
         ngbs = [p[0].state for p in self._constraint_graph.neighbors(var.name)]
@@ -84,9 +82,7 @@ class CSPProblem(ABC):
         for n in ngbs:
             if n in assignment:
                 check.append(
-                    self._constraints[(var.name, n)](value, assignment[n])
-                    if (var.name, n) in self._constraints else
-                    self._constraints[(n, var.name)](assignment[n], value)
+                    self.constraint_checks(var.name, n, value, assignment[n])
                 )
 
         return np.all(check)
@@ -102,35 +98,37 @@ class CSPProblem(ABC):
 
     def neighbors_except(self, x_i, x_j):
         neighbors = self._constraint_graph.neighbors(x_i)
-        selected = [p.state for p in neighbors if p.state != x_j]
+        selected = [p[0].state for p in neighbors if p[0].state != x_j and
+                    p[0].state in self._unassigned_variables]
+        # TODO verificar se sao apenas as unassigned
         return selected
 
     def is_solution(self, candidate):
-        for inc in candidate:
+        for incg in candidate:
             ngbr = [
-                n[0].state for n in self._constraint_graph.neighbors(inc)
+                n[0].state for n in self._constraint_graph.neighbors(incg)
             ]
             for n in ngbr:
-                if not self.constraint_checks(inc, n, candidate[inc],
+                if not self.constraint_checks(incg, n, candidate[incg],
                                               candidate[n]):
                     return False
 
         return True
 
     def unassigned_neighbors(self, x_i):
-        neighbors = self._constraint_graph.neighbors(x_i)
-        selected = [p for p in neighbors if p in
-                    self._unassigned_variables]
-        return selected
+        neighbors = [n[0].state for n in self._constraint_graph.neighbors(x_i)
+                     if n[0].state in self._unassigned_variables]
+        return neighbors
 
     def domain(self, var_id):
         if var_id in self._unassigned_variables:
             return self._unassigned_variables[var_id].domain()
         else:
-            return self._assigned_variables[var_id].domain()
+            return [self._assigned_variables[var_id].value]
 
     def rem_from_domain(self, var_id, val):
-        if var_id in self._unassigned_variables:
-            return self._unassigned_variables[var_id].rem_from_domain(val)
-        else:
-            return self._assigned_variables[var_id].rem_from_domain(val)
+        return self._unassigned_variables[var_id].rem_from_domain(val)
+
+    def restore_modified_domains(self, removed):
+        for var, value in removed:
+            self._unassigned_variables[var].expand_domain(value)

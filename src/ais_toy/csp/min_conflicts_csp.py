@@ -22,6 +22,12 @@ class MinConflictsCSP(CSPProblem):
             self.assign_variable(val, dmn[d_idx])
         return r_assign
 
+    def domain(self, var_id):
+        return self._assigned_variables[var_id].domain()
+
+    def rem_from_domain(self, var_id, val):
+        return self._assigned_variables[var_id].rem_from_domain(val)
+
     def select_unassigned_var(self):
         confliting_vars = []
         for val, var in self._assigned_variables.items():

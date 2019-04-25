@@ -1,5 +1,7 @@
 def backtracking_search(csp):
-    return _backtrack({}, csp)
+    aux = _backtrack({}, csp)
+    print('SOLUCAO NAO ENCONTRADA' if aux is None else 'SOLUCAO ENCONTRADA')
+    return aux
 
 
 def _backtrack(assignment, csp):
@@ -9,10 +11,11 @@ def _backtrack(assignment, csp):
     var = csp.select_unassigned_var()
     for value in csp.order_domain_values(var):
         inferences = None
+        removed = []
         if csp.is_consistent(var, value, assignment):
-            assignment[var.name] = value
             csp.assign_variable(var, value)
-            inferences = csp.inference(var, value)
+            assignment[var.name] = value
+            inferences, removed = csp.inference(var, value)
             if inferences is not None:
                 assignment.update(inferences)
                 result = _backtrack(assignment, csp)
@@ -20,9 +23,10 @@ def _backtrack(assignment, csp):
                     return result
         if var.name in assignment:
             csp.unassign_variable(var)
-            del assignment[var.name]
+            assignment.pop(var.name, None)
         if inferences is not None:
             for inference in inferences:
                 csp.unassign_variable(inference)
                 assignment.pop(inference, None)
+        csp.restore_modified_domains(removed)
     return None
