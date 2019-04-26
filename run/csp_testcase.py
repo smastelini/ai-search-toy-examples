@@ -42,7 +42,7 @@ def solve_and_compute(method_n, method, problem, max_steps):
     np.random.seed(seed)
     csp = method(**problem)
     print('Solving')
-    if method_n == 'Min Conflicts':
+    if method_n == 'Min-Conflicts':
         start = time.time()
         solution = csp.solve(max_steps=max_steps)
         end = time.time()
@@ -68,10 +68,10 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=100000,
         os.makedirs(plot_logs)
 
     solvers = {
-        # 'Backtracking': BacktrackingCSP,
         'Backtracking Forward Checking': BacktrackingCSPFowardChecking,
-        # 'Backtracking MAC': BacktrackingCSPMAC,
-        # 'Min Conflicts': MinConflictsCSP
+        'Backtracking MAC': BacktrackingCSPMAC,
+        'Min-Conflicts': MinConflictsCSP,
+        'Backtracking': BacktrackingCSP,
     }
 
     print('Generating problems')
@@ -83,9 +83,9 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=100000,
                 problems[(size, k, r)] = random_map_coloring(size, k)
     print('Problems generated')
 
-    for k in k_sizes:
-        for size in problem_sizes:
-            for solver_n, solver in solvers.items():
+    for solver_n, solver in solvers.items():
+        for k in k_sizes:
+            for size in problem_sizes:
                 log_name = '{0}/mc_{1}_{2}_{3}.tdat'.format(
                     time_logs, size, k, solver_n.lower().replace(' ', '_')
                 )
@@ -120,18 +120,14 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=100000,
                     d['seed'] = seed
 
                     tlog[r] = d
-                    # with open(log_name, 'wb') as f:
-                    #     pickle.dump(obj=tlog, file=f, protocol=-1)
-
-                # f.close()
+                    with open(log_name, 'wb') as f:
+                        pickle.dump(obj=tlog, file=f, protocol=-1)
 
 
 np.random.seed(7)
-# k_sizes = [3, 4]
-# problem_sizes = [5, 10, 15, 20, 30, 40, 50]
-k_sizes = [4]
-problem_sizes = [50]
+k_sizes = [3, 4]
+problem_sizes = [5, 10, 15, 20, 30, 40, 50, 70, 100]
 
 if __name__ == '__main__':
     check_and_solve(k_sizes=k_sizes, problem_sizes=problem_sizes,
-                    n_repeats=1, max_steps=100000, output_path='./results')
+                    n_repeats=10, max_steps=1000000, output_path='./results')

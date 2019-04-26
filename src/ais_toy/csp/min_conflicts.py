@@ -6,4 +6,5 @@ def min_conflicts(csp, max_steps):
         var = csp.select_unassigned_var()
         value = csp.argmin_conflicts(var)
         current[var.name] = value
+        csp.assign_variable(var, value)
     return None

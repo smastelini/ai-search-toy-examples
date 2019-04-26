@@ -1,19 +1,23 @@
 import numpy as np
 from .csp_problem import CSPProblem
 from .min_conflicts import min_conflicts
+from ais_toy.struct import Incognita
 
 
 class MinConflictsCSP(CSPProblem):
     def __init__(self, X, D, C):
         super().__init__(X, D, C)
-        self._assigned_variables = self._unassigned_variables
-        self._unassigned_variables = {}
+
+    def assign_variable(self, var, value):
+        if isinstance(var, Incognita):
+            var = var.name
+        self._unassigned_variables[var].value = value
 
     def get_complete_assignment(self):
-        """ Used by the local search methods, which deal with complete
+        """ Used by the local search method, which deal with complete
         assignments"""
         r_assign = {}
-        for val, var in self._assigned_variables.items():
+        for val, var in self._unassigned_variables.items():
             dmn = var.domain()
             d_idx = np.random.randint(
                 low=0, high=len(dmn)
@@ -34,24 +38,21 @@ class MinConflictsCSP(CSPProblem):
         return True
 
     def domain(self, var_id):
-        return self._assigned_variables[var_id].domain()
-
-    def rem_from_domain(self, var_id, val):
-        self._assigned_variables[var_id].rem_from_domain(val)
+        return self._unassigned_variables[var_id].domain()
 
     def select_unassigned_var(self):
         confliting_vars = []
-        for val, var in self._assigned_variables.items():
-            ngbrs = self._constraint_graph.neighbors(val)
+        for var in self._unassigned_variables.values():
+            ngbrs = self._constraint_graph.neighbors(var.name)
 
             for n in ngbrs:
                 if not self.constraint_checks(
-                    val, n, var.value, self._assigned_variables[n].value
+                    var.name, n, var.value, self._unassigned_variables[n].value
                 ):
-                    confliting_vars.append(val)
+                    confliting_vars.append(var.name)
                     break
         sel = np.random.randint(low=0, high=len(confliting_vars))
-        return self._assigned_variables[confliting_vars[sel]]
+        return self._unassigned_variables[confliting_vars[sel]]
 
     def order_domain_values(self, var, assignment):
         raise NotImplementedError
@@ -71,8 +72,11 @@ class MinConflictsCSP(CSPProblem):
             for n in ngbrs:
                 count += int(
                     not self.constraint_checks(
-                        var.name, n, v, self._assigned_variables[n].value
+                        var.name, n, v, self._unassigned_variables[n].value
                     )
                 )
             conflicts[v] = count
-        return min(conflicts, key=conflicts.get)
+        min_v = min(conflicts.values())
+        candidates = [n for n in conflicts
+                      if conflicts[n] == min_v]
+        return candidates[np.random.randint(low=0, high=len(candidates))]
