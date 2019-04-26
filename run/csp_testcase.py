@@ -126,7 +126,7 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=100000,
 
 np.random.seed(7)
 k_sizes = [3, 4]
-problem_sizes = [5, 10, 15, 20, 30, 40, 50, 70, 100]
+problem_sizes = [5, 10, 15, 20, 30, 40, 50]
 
 if __name__ == '__main__':
     check_and_solve(k_sizes=k_sizes, problem_sizes=problem_sizes,
