@@ -84,13 +84,6 @@ class CSPProblem(ABC):
                 check.append(
                     self.constraint_checks(var.name, n, value, assignment[n])
                 )
-            # else:
-            #     stsfs = []
-            #     for v in self._unassigned_variables[n].domain():
-            #         stsfs.append(
-            #             self.constraint_checks(var.name, n, value, v)
-            #         )
-            #     check.append(np.any(stsfs))
 
         return np.all(check)
 

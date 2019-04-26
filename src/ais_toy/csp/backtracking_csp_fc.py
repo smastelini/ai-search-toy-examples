@@ -22,7 +22,6 @@ class BacktrackingCSPFowardChecking(BacktrackingCSP):
                     var, value
                 )
                 inferences[var] = value
-        print(inferences)
         return (inferences, removed) if checked else (None, removed)
 
     def solve(self):

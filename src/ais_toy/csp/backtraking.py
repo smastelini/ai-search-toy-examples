@@ -1,7 +1,5 @@
 def backtracking_search(csp):
-    aux = _backtrack({}, csp)
-    print('SOLUCAO NAO ENCONTRADA' if aux is None else 'SOLUCAO ENCONTRADA')
-    return aux
+    return _backtrack({}, csp)
 
 
 def _backtrack(assignment, csp):
