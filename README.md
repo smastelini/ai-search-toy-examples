@@ -6,7 +6,7 @@ Proper documentation will be added gradually.
 
 The performed experiments with the map coloring problem are registered in the folder `run/results`, and they can be replicated by simply running the script `run/csp_testcase.py`.
 
-All the scripts were implemented in Python and require `numpy` and `matplotlib` for working.
+All the scripts were implemented in Python and require `numpy`, `pandas` and `matplotlib` for working.
 
 ** Observation: the repository contains a subfolder entitled classical search, which originally was intended to contain traditional heuristic and uninformed search algorithms (A*, for instance). However, due to time limitations, only the CSP approaches were actually implemented. Maybe in the future I will finish their implementation, offering a (hopefully) useful resource for new students interested in this kind of algorithms.
 
