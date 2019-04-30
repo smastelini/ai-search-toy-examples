@@ -13,7 +13,7 @@ from ais_toy.csp import MinConflictsCSP
 from ais_toy.problem_generator import random_map_coloring
 
 
-def plot_solution_and_save(problem, solution, method_n, n_points, k, path):
+def plot_solution_and_save(problem, solution, method_n, n_points, k, r, path):
     colors = {
      0: 'red',
      1: 'blue',
@@ -31,8 +31,8 @@ def plot_solution_and_save(problem, solution, method_n, n_points, k, path):
     plt.xlabel('x')
     plt.ylabel('y')
     plt.title('Map coloring ({0}): {1} x {2}'.format(method_n, n_points, k))
-    plt.savefig('{0}/map_coloring_{1}_{2}_{3}.eps'.format(
-        path, n_points, k, method_n.lower().replace(' ', '_')
+    plt.savefig('{0}/map_coloring_{1}_{2}_{3}_r{4:02d}.eps'.format(
+        path, n_points, k, method_n.lower().replace(' ', '_'), r
     ))
 
 
@@ -97,7 +97,6 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=100000,
                     with open(log_name, 'rb') as f:
                         tlog = pickle.load(f)
 
-                plot_saved = False
                 for r in range(n_repeats):
                     print('{0}_{1}_{2}_r{3:02d}'.format(size, k, solver_n, r))
                     if r in tlog:
@@ -108,11 +107,11 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=100000,
                         solver_n, solver, problem, max_steps
                     )
 
-                    if solution is not None and not plot_saved:
+                    if solution is not None:
                         plot_solution_and_save(
-                            problem, solution, solver_n, size, k, plot_logs
+                            problem, solution, solver_n, size, k, r + 1,
+                            plot_logs
                         )
-                        plot_saved = True
 
                     d = {}
                     d['duration'] = t_time
@@ -130,4 +129,5 @@ problem_sizes = [5, 10, 15, 20, 30, 40, 50]
 
 if __name__ == '__main__':
     check_and_solve(k_sizes=k_sizes, problem_sizes=problem_sizes,
-                    n_repeats=10, max_steps=1000000, output_path='./results')
+                    n_repeats=10, max_steps=1000000,
+                    output_path='./results_all_plots')
