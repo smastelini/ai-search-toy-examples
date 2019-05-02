@@ -1,5 +1,4 @@
 from ais_toy.csp import BacktrackingCSP
-from ais_toy.csp import backtracking_search
 from ais_toy.csp import forward_checking
 
 
@@ -12,6 +11,3 @@ class BacktrackingCSPFowardChecking(BacktrackingCSP):
         checked, removed = forward_checking(var, value, self)
 
         return ({}, removed) if checked else (None, removed)
-
-    def solve(self):
-        return backtracking_search(self)

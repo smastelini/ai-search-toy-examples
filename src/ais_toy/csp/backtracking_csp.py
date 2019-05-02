@@ -25,7 +25,7 @@ class BacktrackingCSP(CSPProblem):
         return least_constraining_value(self, var.name)
 
     def inference(self, var, value):
-        return {}, {}
+        return ({}, [])
 
     def solve(self):
         return backtracking_search(self)
