@@ -34,6 +34,7 @@ def plot_solution_and_save(problem, solution, method_n, n_points, k, r, path):
     plt.savefig('{0}/map_coloring_{1}_{2}_{3}_r{4:02d}.eps'.format(
         path, n_points, k, method_n.lower().replace(' ', '_'), r
     ))
+    plt.close()
 
 
 def solve_and_compute(method_n, method, problem, max_steps):
@@ -125,9 +126,10 @@ def check_and_solve(k_sizes, problem_sizes, n_repeats=10, max_steps=100000,
 
 np.random.seed(7)
 k_sizes = [3, 4]
-problem_sizes = [5, 10, 15, 20, 30, 40, 50]
+# problem_sizes = [5, 10, 15, 20, 30, 40, 50]
+problem_sizes = [5, 10, 15, 20]
 
 if __name__ == '__main__':
     check_and_solve(k_sizes=k_sizes, problem_sizes=problem_sizes,
-                    n_repeats=10, max_steps=1000000,
-                    output_path='./results_all_plots')
+                    n_repeats=10, max_steps=10000,
+                    output_path='./results_test')
